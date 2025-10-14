@@ -3,6 +3,35 @@ set -e
 
 echo "Running post-create setup..."
 
+# Install Python data engineering packages
+echo "Installing Python data engineering packages..."
+pip3 install --no-cache-dir \
+    pandas \
+    numpy \
+    sqlalchemy \
+    pyodbc \
+    jupyter \
+    jupyterlab \
+    matplotlib \
+    seaborn \
+    plotly \
+    scikit-learn \
+    azure-identity \
+    azure-storage-blob \
+    azure-storage-file-datalake \
+    azure-synapse-spark \
+    pyspark \
+    databricks-cli \
+    great-expectations \
+    dbt-core \
+    dbt-sqlserver \
+    prefect \
+    apache-airflow
+
+# Install additional Node.js tools
+echo "Installing Node.js tools..."
+npm install -g @sqltools/cli
+
 # Install additional Python packages if requirements.txt exists
 if [ -f "requirements.txt" ]; then
     echo "Installing Python dependencies from requirements.txt..."
