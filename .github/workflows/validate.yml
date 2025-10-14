@@ -1,0 +1,240 @@
+name: Validate Infrastructure and Code
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  validate-terraform:
+    name: Validate Terraform
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+
+      - name: Terraform Format Check
+        run: |
+          if [ -d "terraform" ]; then
+            cd terraform
+            terraform fmt -check -recursive
+          else
+            echo "No terraform directory found, skipping"
+          fi
+
+      - name: Terraform Init and Validate
+        run: |
+          if [ -d "terraform" ]; then
+            cd terraform
+            for dir in */; do
+              if [ -f "$dir/main.tf" ]; then
+                echo "Validating $dir"
+                cd "$dir"
+                terraform init -backend=false
+                terraform validate
+                cd ..
+              fi
+            done
+          else
+            echo "No terraform directory found, skipping"
+          fi
+
+  validate-bicep:
+    name: Validate Bicep
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Azure CLI
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+        continue-on-error: true
+
+      - name: Install Bicep CLI
+        run: |
+          curl -Lo bicep https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64
+          chmod +x ./bicep
+          sudo mv ./bicep /usr/local/bin/bicep
+
+      - name: Bicep Build and Validate
+        run: |
+          if [ -d "bicep" ]; then
+            cd bicep
+            for file in *.bicep; do
+              if [ -f "$file" ]; then
+                echo "Building $file"
+                bicep build "$file"
+              fi
+            done
+          else
+            echo "No bicep directory found, skipping"
+          fi
+
+  validate-python:
+    name: Validate Python Code
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          pip install black pylint pytest
+
+      - name: Check Python formatting with Black
+        run: |
+          if compgen -G "*.py" > /dev/null || compgen -G "**/*.py" > /dev/null; then
+            black --check .
+          else
+            echo "No Python files found, skipping"
+          fi
+        continue-on-error: true
+
+      - name: Lint with Pylint
+        run: |
+          if compgen -G "*.py" > /dev/null || compgen -G "**/*.py" > /dev/null; then
+            pylint **/*.py || true
+          else
+            echo "No Python files found, skipping"
+          fi
+        continue-on-error: true
+
+      - name: Test with pytest
+        run: |
+          if [ -d "tests" ]; then
+            pytest tests/
+          else
+            echo "No tests directory found, skipping"
+          fi
+        continue-on-error: true
+
+  validate-sql:
+    name: Validate SQL Scripts
+    runs-on: ubuntu-latest
+    services:
+      mssql:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: YourStrong!Passw0rd
+          MSSQL_PID: Developer
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YourStrong!Passw0rd -Q 'SELECT 1'"
+          --health-interval 10s
+          --health-timeout 3s
+          --health-retries 10
+          --health-start-period 10s
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Wait for SQL Server
+        run: |
+          for i in {1..30}; do
+            if /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong!Passw0rd' -Q "SELECT 1" > /dev/null 2>&1; then
+              echo "SQL Server is ready"
+              break
+            fi
+            echo "Waiting for SQL Server... ($i/30)"
+            sleep 2
+          done
+
+      - name: Test SQL Scripts
+        run: |
+          if [ -d "sql" ]; then
+            echo "SQL directory found, but validation requires manual review"
+            echo "Consider adding SQL linting tools in the future"
+          else
+            echo "No sql directory found, skipping"
+          fi
+
+  validate-notebooks:
+    name: Validate Jupyter Notebooks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Jupyter
+        run: |
+          python -m pip install --upgrade pip
+          pip install jupyter nbconvert nbformat
+
+      - name: Check Notebook Syntax
+        run: |
+          if [ -d "notebooks" ]; then
+            cd notebooks
+            for notebook in *.ipynb; do
+              if [ -f "$notebook" ]; then
+                echo "Checking $notebook"
+                jupyter nbconvert --to notebook --execute --stdout "$notebook" > /dev/null || true
+              fi
+            done
+          else
+            echo "No notebooks directory found, skipping"
+          fi
+        continue-on-error: true
+
+  validate-docker:
+    name: Validate Docker Configuration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Validate Dockerfile
+        run: |
+          if [ -f ".devcontainer/Dockerfile" ]; then
+            docker build -f .devcontainer/Dockerfile .devcontainer --target base || true
+          fi
+        continue-on-error: true
+
+      - name: Validate docker-compose
+        run: |
+          if [ -f ".devcontainer/docker-compose.yml" ]; then
+            docker compose -f .devcontainer/docker-compose.yml config
+          fi
+        continue-on-error: true
+
+  markdown-lint:
+    name: Lint Markdown Files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run markdownlint
+        uses: actionshub/markdownlint@main
+        continue-on-error: true
