@@ -28,9 +28,9 @@ pip3 install --no-cache-dir \
     prefect \
     apache-airflow
 
-# Install additional Node.js tools
-echo "Installing Node.js tools..."
-npm install -g @sqltools/cli
+# Install uvx
+echo "Installing uvx packages..."
+pip install --no-cache-dir uv
 
 # Install additional Python packages if requirements.txt exists
 if [ -f "requirements.txt" ]; then
@@ -80,12 +80,12 @@ echo "- Start Jupyter: jupyter lab --ip=0.0.0.0 --port=8888 --no-browser"
 echo ""
 
 # Create sample directories
-mkdir -p /workspace/terraform
-mkdir -p /workspace/bicep
-mkdir -p /workspace/sql
-mkdir -p /workspace/notebooks
-mkdir -p /workspace/pipelines
-mkdir -p /workspace/data
+mkdir -p /workspaces/SDLR-reinvented-data-engineering/terraform
+mkdir -p /workspaces/SDLR-reinvented-data-engineering/bicep
+mkdir -p /workspaces/SDLR-reinvented-data-engineering/sql
+mkdir -p /workspaces/SDLR-reinvented-data-engineering/notebooks
+mkdir -p /workspaces/SDLR-reinvented-data-engineering/pipelines
+mkdir -p /workspaces/SDLR-reinvented-data-engineering/data
 
-echo "Sample directories created in /workspace"
+echo "Sample directories created in /workspaces/SDLR-reinvented-data-engineering"
 echo "Setup complete! Happy coding!"

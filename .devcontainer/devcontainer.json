@@ -34,7 +34,11 @@
         "redhat.vscode-yaml",
         "esbenp.prettier-vscode",
         "eamodio.gitlens",
-        "mhutchie.git-graph"
+        "mhutchie.git-graph",
+        "fabric.vscode-fabric",
+        "fabric.vscode-fabric-functions",
+        "SynapseVSCode.synapse",
+        "SynapseVSCode.vscode-synapse-remote"
       ],
       
       "settings": {
