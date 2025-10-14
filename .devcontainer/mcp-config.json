@@ -1,0 +1,64 @@
+{
+  "mcpServers": {
+    "terraform": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-terraform"],
+      "description": "MCP server for Terraform infrastructure as code",
+      "capabilities": [
+        "terraform-plan",
+        "terraform-validate",
+        "resource-schema"
+      ]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "description": "MCP server for GitHub operations",
+      "capabilities": [
+        "repository-operations",
+        "issue-management",
+        "pull-request-management"
+      ]
+    },
+    "azure": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-azure"],
+      "env": {
+        "AZURE_SUBSCRIPTION_ID": "${AZURE_SUBSCRIPTION_ID}",
+        "AZURE_TENANT_ID": "${AZURE_TENANT_ID}"
+      },
+      "description": "MCP server for Azure resource management",
+      "capabilities": [
+        "resource-queries",
+        "bicep-templates",
+        "deployment-operations"
+      ]
+    },
+    "mssql": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-mssql"],
+      "env": {
+        "MSSQL_CONNECTION_STRING": "Server=localhost,1433;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=true"
+      },
+      "description": "MCP server for MSSQL database operations",
+      "capabilities": [
+        "schema-queries",
+        "query-execution",
+        "database-management"
+      ]
+    },
+    "fabric": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fabric"],
+      "description": "MCP server for Microsoft Fabric operations",
+      "capabilities": [
+        "workspace-management",
+        "notebook-operations",
+        "pipeline-management"
+      ]
+    }
+  }
+}
