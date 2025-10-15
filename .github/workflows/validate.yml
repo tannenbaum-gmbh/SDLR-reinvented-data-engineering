@@ -144,9 +144,9 @@ jobs:
         options: >-
           --health-cmd "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YourStrong!Passw0rd -Q 'SELECT 1'"
           --health-interval 10s
-          --health-timeout 3s
-          --health-retries 10
-          --health-start-period 10s
+          --health-timeout 6s
+          --health-retries 20
+          --health-start-period 6s
 
     steps:
       - name: Checkout code
