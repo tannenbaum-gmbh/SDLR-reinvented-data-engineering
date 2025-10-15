@@ -143,12 +143,6 @@ jobs:
           MSSQL_PID: Developer
         ports:
           - 1433:1433
-        options: >-
-          --health-cmd "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YourStrong!Passw0rd -Q 'SELECT 1'"
-          --health-interval 10s
-          --health-timeout 10s
-          --health-retries 24
-          --health-start-period 60s
 
     steps:
       - name: Checkout code
@@ -156,12 +150,12 @@ jobs:
 
       - name: Wait for SQL Server
         run: |
-          for i in {1..30}; do
+          for i in {1..150}; do
             if /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong!Passw0rd' -Q "SELECT 1" > /dev/null 2>&1; then
               echo "SQL Server is ready"
               break
             fi
-            echo "Waiting for SQL Server... ($i/30)"
+            echo "Waiting for SQL Server... ($i/150)"
             sleep 2
           done
 
