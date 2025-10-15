@@ -29,9 +29,9 @@ services:
     healthcheck:
       test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YourStrong!Passw0rd -Q "SELECT 1" || exit 1
       interval: 10s
-      timeout: 6s
-      retries: 20
-      start_period: 6s
+      timeout: 10s
+      retries: 24
+      start_period: 60s
 
 volumes:
   mssql-data:
