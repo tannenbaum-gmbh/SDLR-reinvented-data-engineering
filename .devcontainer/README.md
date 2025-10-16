@@ -23,10 +23,13 @@ This devcontainer provides a complete development environment for demonstrating 
   - Great Expectations for data quality
   - Prefect, Apache Airflow for orchestration
 
-### Microsoft Fabric Support
+### Microsoft Fabric & Azure Databricks Support
 - Fabric VS Code extension
 - Azure Synapse integration libraries
-- Databricks CLI for unified analytics
+- Databricks VS Code extension for notebook development
+- Databricks CLI for unified analytics platform
+- Databricks Connect for local development with remote clusters
+- Databricks SQL connector for data warehouse queries
 
 ### GitHub & Development Tools
 - **GitHub CLI**: For GitHub operations
@@ -73,6 +76,12 @@ az login
 ```bash
 gh auth login
 ```
+
+#### Databricks
+```bash
+databricks configure --token
+```
+You'll need your Databricks workspace URL and a personal access token.
 
 ### Connect to MSSQL Server
 

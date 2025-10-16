@@ -38,7 +38,8 @@
         "fabric.vscode-fabric",
         "fabric.vscode-fabric-functions",
         "SynapseVSCode.synapse",
-        "SynapseVSCode.vscode-synapse-remote"
+        "SynapseVSCode.vscode-synapse-remote",
+        "databricks.databricks"
       ],
       
       "settings": {
