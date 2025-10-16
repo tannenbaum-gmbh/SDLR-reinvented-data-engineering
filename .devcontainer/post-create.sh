@@ -22,6 +22,8 @@ pip3 install --no-cache-dir \
     azure-synapse-spark \
     pyspark \
     databricks-cli \
+    databricks-connect \
+    databricks-sql-connector \
     great-expectations \
     dbt-core \
     dbt-sqlserver \

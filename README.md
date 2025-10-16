@@ -58,7 +58,9 @@ The devcontainer includes:
 ### Microsoft Fabric & Azure
 - Fabric VS Code extension
 - Azure Synapse libraries
-- Databricks CLI
+- Azure Databricks extension and CLI
+- Databricks Connect for local development
+- Databricks SQL connector
 
 ### Development Tools
 - **GitHub CLI** - GitHub operations
